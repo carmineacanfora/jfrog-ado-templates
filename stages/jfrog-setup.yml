@@ -17,6 +17,23 @@ steps:
     displayName: 'Configure JFrog CLI (OIDC)'
 
   - script: |
+      echo "Checking available output variables..."
+      echo "oidc_token length: ${#OIDC_TOKEN}"
+      echo "oidc_user: $OIDC_USER"
+
+      # Check if token is empty
+      if [ -z "$OIDC_TOKEN" ]; then
+        echo "##[error]OIDC token is empty. Output variable not captured."
+        echo "Trying alternative variable names..."
+        echo "JFROGSETUP_OIDC_TOKEN length: ${#JFROGSETUP_OIDC_TOKEN}"
+        exit 1
+      fi
+    displayName: 'Debug - Check OIDC Token'
+    env:
+      OIDC_TOKEN: $(jfrogSetup.oidc_token)
+      OIDC_USER: $(jfrogSetup.oidc_user)
+      JFROGSETUP_OIDC_TOKEN: $(JFROGSETUP_OIDC_TOKEN)
+      
       JF_PATH=$(find /opt/hostedtoolcache/jf -name "jf" -type f 2>/dev/null | head -1)
       if [ -z "$JF_PATH" ]; then
         echo "##[error]JFrog CLI not found"
