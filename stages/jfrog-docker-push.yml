@@ -26,5 +26,7 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf docker push ${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}"'
+      command: |
+        jf docker login ${{ parameters.jfrogUrl }}
+        jf docker push ${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}"
     displayName: 'Push Docker Image'
