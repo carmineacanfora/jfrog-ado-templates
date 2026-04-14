@@ -1,32 +1,15 @@
 # stages/jfrog-setup.yml
-# Installs and configures JFrog CLI via OIDC.
+# Configures JFrog CLI via OIDC using the ADO extension.
 # Admin-controlled — devs cannot modify.
 
 parameters:
-  - name: jfrogUrl
+  - name: jfrogConnection
     type: string
-  - name: oidcProviderName
-    type: string
-  - name: oidcAudience
-    type: string
-    default: ''
 
 steps:
-  - script: |
-      curl -fL https://install-cli.jfrog.io | sh
-      OIDC_AUDIENCE="${{ parameters.oidcAudience }}"
-      if [ -n "$OIDC_AUDIENCE" ]; then
-        jf c add jfrog-server \
-          --url="https://${{ parameters.jfrogUrl }}/" \
-          --oidc-provider-name="${{ parameters.oidcProviderName }}" \
-          --oidc-audience="$OIDC_AUDIENCE" \
-          --interactive=false
-      else
-        jf c add jfrog-server \
-          --url="https://${{ parameters.jfrogUrl }}/" \
-          --oidc-provider-name="${{ parameters.oidcProviderName }}" \
-          --interactive=false
-      fi
-      jf c use jfrog-server
-      echo "JFrog CLI version: $(jf --version)"
-    displayName: 'Install & Configure JFrog CLI (OIDC)'
+  - task: JFrogCliV2@1
+    name: jfrogSetup
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf rt ping'
+    displayName: 'Configure JFrog CLI (OIDC)'
