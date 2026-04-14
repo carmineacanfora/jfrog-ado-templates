@@ -1,38 +1,15 @@
 # stages/jfrog-setup.yml
-# Installs JFrog CLI and configures via OIDC using the ADO extension
-# for token exchange, then creates a persistent server config.
+# Verifies JFrog connection via OIDC. 
+# The JFrogCliV2@1 task handles CLI install and auth.
 # Admin-controlled — devs cannot modify.
 
 parameters:
   - name: jfrogConnection
     type: string
-  - name: jfrogUrl
-    type: string
 
 steps:
   - task: JFrogCliV2@1
-    name: jfrogSetup
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt ping'
-    displayName: 'OIDC Token Exchange'
-
-  - script: |
-      echo "Token length: ${#OIDC_TOKEN}"
-      echo "User: $OIDC_USER"
-    displayName: 'Debug Token'
-    env:
-      OIDC_TOKEN: $(jfrogSetup.oidc_token)
-      OIDC_USER: $(jfrogSetup.oidc_user)
-
-  - script: |
-      curl -fL https://install-cli.jfrog.io | sh
-      jf c add jfrog-server \
-        --url="https://${{ parameters.jfrogUrl }}/" \
-        --access-token="$OIDC_TOKEN" \
-        --interactive=false
-      jf c use jfrog-server
-      jf rt ping
-    displayName: 'Install & Configure JFrog CLI'
-    env:
-      OIDC_TOKEN: $(jfrogSetup.oidc_token)
+    displayName: 'Verify JFrog Connection (OIDC)'
