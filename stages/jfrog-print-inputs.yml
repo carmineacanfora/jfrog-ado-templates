@@ -71,4 +71,4 @@ steps:
       echo "Xray Build Scan:       ${{ parameters.enableBuildScan }}"
       echo ""
       echo "========================================="
-    displayName: 'Print Pipeline Configuration'
+    displayName: 'Print Inputs'

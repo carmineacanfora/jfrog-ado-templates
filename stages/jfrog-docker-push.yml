@@ -45,7 +45,7 @@ steps:
       echo "##vso[task.setvariable variable=DOCKER_DIGEST]$DIGEST"
 
       echo "$IMAGE_FULL@$DIGEST" > metadata.json
-    displayName: 'Docker Push'
+    displayName: 'Push Docker Image'
 
   - task: JFrogCliV2@1
     inputs:

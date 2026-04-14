@@ -23,5 +23,5 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}"'
+      command: 'jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}'
     displayName: 'Collect Git Info'

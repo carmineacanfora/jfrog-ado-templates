@@ -13,4 +13,4 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf docker login ${{ parameters.jfrogUrl }}'
-    displayName: 'Docker Authenticate'
+    displayName: 'Docker Login'

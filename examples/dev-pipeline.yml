@@ -31,11 +31,11 @@ extends:
       - script: |
           docker buildx create --use --name mybuilder
           docker buildx inspect --bootstrap
-        displayName: 'Set up Docker Buildx'
+        displayName: 'Setup Docker Buildx'
       - task: UseNode@1
         inputs:
           version: '18.x'
-        displayName: 'Install Node 18'
+        displayName: 'Setup Node'
 
     # --- NPM Install ---
     enableNpm: true
@@ -60,7 +60,7 @@ extends:
             --provenance=false \
             --load \
             .
-        displayName: 'Docker Build'
+        displayName: 'Build Docker Image'
 
     # --- Uploads ---
     enableUploadGeneric: true

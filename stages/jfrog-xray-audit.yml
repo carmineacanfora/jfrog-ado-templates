@@ -24,4 +24,4 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf audit --${{ parameters.packageManager }} --fail=${{ parameters.failBuild }}'
-    displayName: 'Xray Audit - ${{ parameters.packageManager }}'
+    displayName: 'Scan Code'

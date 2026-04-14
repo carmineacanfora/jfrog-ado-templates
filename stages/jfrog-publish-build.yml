@@ -21,5 +21,5 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --env-exclude="${{ parameters.envExclude }}"'
+      command: 'jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }} --env-exclude="${{ parameters.envExclude }}"'
     displayName: 'Publish Build Info'

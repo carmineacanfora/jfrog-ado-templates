@@ -12,4 +12,4 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt ping'
-    displayName: 'Verify JFrog Connection (OIDC)'
+    displayName: 'Setup JFrog OIDC'

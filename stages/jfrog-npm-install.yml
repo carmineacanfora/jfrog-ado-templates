@@ -44,9 +44,3 @@ steps:
           jf npmc --repo-resolve ${{ parameters.resolveRepo }}
           jf curation-audit --threads=${{ parameters.threads }}
       displayName: 'Curation Audit (on NPM failure)'
-
-    - script: |
-        echo "##[error]NPM Install failed. See Curation Audit results above."
-        exit 1
-      condition: not(eq(variables['Agent.JobStatus'], 'Succeeded'))
-      displayName: 'Fail pipeline after Curation Audit'

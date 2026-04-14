@@ -28,4 +28,4 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat=${{ parameters.flat }} --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}"'
-    displayName: 'Upload to ${{ parameters.targetRepo }}'
+    displayName: 'Push Generic Artifact'

@@ -26,4 +26,4 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}"'
-    displayName: 'Upload Helm Charts to ${{ parameters.targetRepo }}'
+    displayName: 'Push Helm Charts'
