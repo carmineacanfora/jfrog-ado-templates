@@ -141,9 +141,6 @@ parameters:
     type: boolean
     default: true
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 steps:
   # =============================================================
   # 1. Print Inputs (admin, always)
