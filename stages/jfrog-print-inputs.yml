@@ -19,8 +19,6 @@ parameters:
     type: string
   - name: enableXrayAudit
     type: boolean
-  - name: enableDockerAuth
-    type: boolean
   - name: enableDockerPush
     type: boolean
   - name: dockerRepo
