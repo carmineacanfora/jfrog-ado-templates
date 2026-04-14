@@ -15,7 +15,7 @@ extends:
   parameters:
     # --- JFrog Connection ---
     jfrogUrl: 'solengeu.jfrog.io'
-    oidcProviderName: 'ado-oidc'
+    oidcProviderName: 'carm-ado-oidc'
     project: 'carm'
 
     # --- Build Info ---
