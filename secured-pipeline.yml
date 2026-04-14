@@ -78,9 +78,6 @@ parameters:
     default: true
 
   # --- Docker ---
-  - name: enableDockerAuth
-    type: boolean
-    default: false
   - name: enableDockerPush
     type: boolean
     default: false
@@ -219,15 +216,6 @@ steps:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         packageManager: ${{ parameters.xrayPackageManager }}
         failBuild: ${{ parameters.xrayFailBuild }}
-
-  # =============================================================
-  # 6. Docker Authenticate (admin, optional)
-  # =============================================================
-  - ${{ if eq(parameters.enableDockerAuth, true) }}:
-    - template: stages/jfrog-docker-login.yml
-      parameters:
-        jfrogConnection: ${{ parameters.jfrogConnection }}
-        jfrogUrl: ${{ parameters.jfrogUrl }}
 
   # =============================================================
   # 7. Docker Build (dev, validated — Layer 2)
