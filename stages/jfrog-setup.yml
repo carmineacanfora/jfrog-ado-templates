@@ -1,5 +1,6 @@
 # stages/jfrog-setup.yml
-# Configures JFrog CLI via OIDC using the ADO extension.
+# Installs JFrog CLI and configures via OIDC using the ADO extension
+# for token exchange, then creates a persistent server config.
 # Admin-controlled — devs cannot modify.
 
 parameters:
@@ -14,42 +15,16 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt ping'
-    displayName: 'Configure JFrog CLI (OIDC)'
+    displayName: 'OIDC Token Exchange'
 
   - script: |
-      echo "Checking available output variables..."
-      echo "oidc_token length: ${#OIDC_TOKEN}"
-      echo "oidc_user: $OIDC_USER"
-
-      # Check if token is empty
-      if [ -z "$OIDC_TOKEN" ]; then
-        echo "##[error]OIDC token is empty. Output variable not captured."
-        echo "Trying alternative variable names..."
-        echo "JFROGSETUP_OIDC_TOKEN length: ${#JFROGSETUP_OIDC_TOKEN}"
-        exit 1
-      fi
-    displayName: 'Debug - Check OIDC Token'
-    env:
-      OIDC_TOKEN: $(jfrogSetup.oidc_token)
-      OIDC_USER: $(jfrogSetup.oidc_user)
-      JFROGSETUP_OIDC_TOKEN: $(JFROGSETUP_OIDC_TOKEN)
-      
-      JF_PATH=$(find /opt/hostedtoolcache/jf -name "jf" -type f 2>/dev/null | head -1)
-      if [ -z "$JF_PATH" ]; then
-        echo "##[error]JFrog CLI not found"
-        exit 1
-      fi
-      JF_DIR=$(dirname "$JF_PATH")
-      echo "##vso[task.prependpath]$JF_DIR"
-
-      # Configure persistent server using OIDC token
-      "$JF_PATH" c add jfrog-server \
+      curl -fL https://install-cli.jfrog.io | sh
+      jf c add jfrog-server \
         --url="https://${{ parameters.jfrogUrl }}/" \
         --access-token="$OIDC_TOKEN" \
         --interactive=false
-      "$JF_PATH" c use jfrog-server
-      echo "JFrog CLI version: $("$JF_PATH" --version)"
-      "$JF_PATH" rt ping
-    displayName: 'Add JFrog CLI to PATH & Configure'
+      jf c use jfrog-server
+      jf rt ping
+    displayName: 'Install & Configure JFrog CLI'
     env:
       OIDC_TOKEN: $(jfrogSetup.oidc_token)
