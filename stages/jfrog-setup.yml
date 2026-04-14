@@ -18,6 +18,14 @@ steps:
     displayName: 'OIDC Token Exchange'
 
   - script: |
+      echo "Token length: ${#OIDC_TOKEN}"
+      echo "User: $OIDC_USER"
+    displayName: 'Debug Token'
+    env:
+      OIDC_TOKEN: $(jfrogSetup.oidc_token)
+      OIDC_USER: $(jfrogSetup.oidc_user)
+
+  - script: |
       curl -fL https://install-cli.jfrog.io | sh
       jf c add jfrog-server \
         --url="https://${{ parameters.jfrogUrl }}/" \
