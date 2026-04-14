@@ -1,0 +1,80 @@
+# Example: How a dev uses the admin templates
+# This file lives in the dev's repo (e.g., express-js-appbundle)
+
+trigger: none
+
+resources:
+  repositories:
+    - repository: jfrog-templates
+      type: git
+      name: 'MyProject/jfrog-pipeline-templates'
+      ref: refs/heads/main
+
+extends:
+  template: secured-pipeline.yml@jfrog-templates
+  parameters:
+    # --- JFrog Connection ---
+    jfrogUrl: 'solengeu.jfrog.io'
+    oidcProviderName: 'ado-oidc'
+    project: 'carm'
+
+    # --- Build Info ---
+    buildName: 'ado-ejs-demo'
+
+    # --- Dev preBuildSteps ---
+    # These run BEFORE JFrog CLI is installed — no JFrog access.
+    preBuildSteps:
+      - checkout: self
+      - script: |
+          docker buildx create --use --name mybuilder
+          docker buildx inspect --bootstrap
+        displayName: 'Set up Docker Buildx'
+      - task: UseNode@1
+        inputs:
+          version: '18.x'
+        displayName: 'Install Node 18'
+
+    # --- NPM Install (with curation audit on failure) ---
+    enableNpm: true
+    npmResolveRepo: 'carm-npmjs-remote'
+    npmArguments: '--loglevel=notice'
+    enableCurationAudit: true
+
+    # --- Xray Audit ---
+    enableXrayAudit: false
+
+    # --- Docker ---
+    enableDockerAuth: true
+    enableDockerPush: true
+    dockerRepo: 'carm-docker-dev-local'
+    imageName: 'ejs'
+
+    # Dev controls how the image is built.
+    # Must tag as: jfrogUrl/dockerRepo/imageName:imageTag
+    # Must NOT push — admin template handles push.
+    dockerBuildSteps:
+      - script: |
+          IMAGE_FULL="solengeu.jfrog.io/carm-docker-dev-local/ejs:$(Build.BuildId)"
+          docker buildx build \
+            --tag "$IMAGE_FULL" \
+            --provenance=false \
+            --load \
+            .
+        displayName: 'Docker Build'
+
+    # --- Uploads ---
+    enableUploadGeneric: true
+    genericSourcePattern: 'rn/Release-Note-App-1.0.pdf'
+    genericTargetRepo: 'carm-generic-dev-local'
+    genericModuleName: 'release_note:$(Build.BuildId)'
+
+    enableUploadHelm: true
+    helmTargetRepo: 'carm-helm-dev-local'
+    helmModuleName: 'helm_charts:$(Build.BuildId)'
+
+    # --- Build Info ---
+    enableCollectBuildInfo: true
+    enablePublishBuild: true
+
+    # --- Build Scan ---
+    enableBuildScan: true
