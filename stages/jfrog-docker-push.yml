@@ -26,7 +26,6 @@ steps:
 
       docker push "$IMAGE_FULL"
 
-      # Capture the digest
       DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_FULL" 2>/dev/null | cut -d'@' -f2)
 
       if [ -z "$DIGEST" ]; then
@@ -47,9 +46,14 @@ steps:
     displayName: 'Docker Push'
 
   - script: |
+      PROJECT_FLAG=""
+      if [ -n "${{ parameters.project }}" ]; then
+        PROJECT_FLAG="--project ${{ parameters.project }}"
+      fi
+
       jf rt build-docker-create ${{ parameters.dockerRepo }} \
         --image-file metadata.json \
         --build-name "${{ parameters.buildName }}" \
         --build-number "${{ parameters.buildNumber }}" \
-        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }}
+        $PROJECT_FLAG
     displayName: 'Add Docker Image to Build Info'
