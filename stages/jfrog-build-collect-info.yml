@@ -18,10 +18,10 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}'
-    displayName: 'Collect Build Environment'
+    displayName: 'Collect Env Info'
 
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}'
-    displayName: 'Collect Git Info'
+    displayName: 'Collect GIT Info'
