@@ -196,6 +196,7 @@ steps:
   - template: stages/jfrog-setup.yml
     parameters:
       jfrogConnection: ${{ parameters.jfrogConnection }}
+      jfrogUrl: ${{ parameters.jfrogUrl }}
 
   # =============================================================
   # 4. NPM Install (admin, optional)
