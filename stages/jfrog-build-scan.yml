@@ -1,0 +1,26 @@
+# stages/jfrog-build-scan.yml
+# Scans a published build with JFrog Xray.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+  - name: failBuild
+    type: boolean
+    default: true
+  - name: vuln
+    type: boolean
+    default: true
+
+steps:
+  - script: |
+      jf build-scan "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project=${{ parameters.project }}${{ endif }} \
+        --fail=${{ parameters.failBuild }} \
+        ${{ if eq(parameters.vuln, true) }}--vuln${{ endif }}
+    displayName: 'Xray Build Scan'
