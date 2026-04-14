@@ -26,13 +26,8 @@
 
 parameters:
   # --- JFrog Connection ---
-  - name: jfrogUrl
+  - name: jfrogConnection
     type: string
-  - name: oidcProviderName
-    type: string
-  - name: oidcAudience
-    type: string
-    default: ''
   - name: project
     type: string
     default: ''
