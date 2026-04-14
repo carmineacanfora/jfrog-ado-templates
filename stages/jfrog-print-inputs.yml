@@ -7,6 +7,10 @@ parameters:
     type: string
   - name: project
     type: string
+  - name: jfrogConnection
+    type: string
+  - name: jfrogUrl
+    type: string
   - name: enableNpm
     type: boolean
   - name: enableCurationAudit
