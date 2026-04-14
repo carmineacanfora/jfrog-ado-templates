@@ -120,9 +120,6 @@ parameters:
     default: ''
 
   # --- Build Info ---
-  - name: enableCollectBuildInfo
-    type: boolean
-    default: false
   - name: enablePublishBuild
     type: boolean
     default: false
@@ -155,7 +152,6 @@ steps:
       imageTag: ${{ parameters.imageTag }}
       enableUploadGeneric: ${{ parameters.enableUploadGeneric }}
       enableUploadHelm: ${{ parameters.enableUploadHelm }}
-      enableCollectBuildInfo: ${{ parameters.enableCollectBuildInfo }}
       enablePublishBuild: ${{ parameters.enablePublishBuild }}
       enableBuildScan: ${{ parameters.enableBuildScan }}
 
@@ -285,21 +281,10 @@ steps:
         moduleName: ${{ parameters.helmModuleName }}
 
   # =============================================================
-  # 11. Collect Build Info (admin, optional)
-  # =============================================================
-  - ${{ if eq(parameters.enableCollectBuildInfo, true) }}:
-    - template: stages/jfrog-build-collect-info.yml
-      parameters:
-        jfrogConnection: ${{ parameters.jfrogConnection }}
-        buildName: ${{ parameters.buildName }}
-        buildNumber: '$(Build.BuildId)'
-        project: ${{ parameters.project }}
-
-  # =============================================================
-  # 12. Publish Build Info (admin, optional)
+  # 11. Collect & Publish Build Info (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enablePublishBuild, true) }}:
-    - template: stages/jfrog-build-publish.yml
+    - template: stages/jfrog-publish-build.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         buildName: ${{ parameters.buildName }}

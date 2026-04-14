@@ -31,8 +31,6 @@ parameters:
     type: boolean
   - name: enableUploadHelm
     type: boolean
-  - name: enableCollectBuildInfo
-    type: boolean
   - name: enablePublishBuild
     type: boolean
   - name: enableBuildScan
@@ -63,7 +61,6 @@ steps:
       echo "  Image Tag:           ${{ parameters.imageTag }}"
       echo "Upload Generic:        ${{ parameters.enableUploadGeneric }}"
       echo "Upload Helm:           ${{ parameters.enableUploadHelm }}"
-      echo "Collect Build Info:    ${{ parameters.enableCollectBuildInfo }}"
       echo "Publish Build:         ${{ parameters.enablePublishBuild }}"
       echo "Xray Build Scan:       ${{ parameters.enableBuildScan }}"
       echo ""
