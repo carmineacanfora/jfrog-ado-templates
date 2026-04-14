@@ -1,10 +1,9 @@
 # stages/jfrog-docker-push.yml
-# Push Docker image and add to build-info via JFrog CLI.
-# Expects the image to be already built and available locally.
+# Docker login, push, and add to build-info in a single CLI session.
 # Admin-controlled — devs cannot modify.
 
 parameters:
-  - name: jfrogArtifactoryConnection
+  - name: jfrogConnection
     type: string
   - name: jfrogUrl
     type: string
@@ -23,13 +22,10 @@ parameters:
     default: ''
 
 steps:
-  - task: JFrogDocker@1
+  - task: JFrogCliV2@1
     inputs:
-      command: 'Push'
-      artifactoryConnection: '${{ parameters.jfrogArtifactoryConnection }}'
-      imageName: '${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }}'
-      collectBuildInfo: true
-      buildName: '${{ parameters.buildName }}'
-      buildNumber: '${{ parameters.buildNumber }}'
-      projectKey: '${{ parameters.project }}'
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: |
+        jf docker login ${{ parameters.jfrogUrl }}
+        jf docker push ${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --project=${{ parameters.project }}
     displayName: 'Push Docker Image'
