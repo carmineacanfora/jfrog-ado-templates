@@ -245,7 +245,7 @@ steps:
   - ${{ if eq(parameters.enableDockerPush, true) }}:
     - template: stages/jfrog-docker-push.yml
       parameters:
-        jfrogConnection: ${{ parameters.jfrogArtifactoryConnection }}
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         jfrogUrl: ${{ parameters.jfrogUrl }}
         dockerRepo: ${{ parameters.dockerRepo }}
         imageName: ${{ parameters.imageName }}
