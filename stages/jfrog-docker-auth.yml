@@ -3,10 +3,14 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: jfrogUrl
     type: string
 
 steps:
-  - script: |
-      jf docker login ${{ parameters.jfrogUrl }}
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf docker login ${{ parameters.jfrogUrl }}'
     displayName: 'Docker Authenticate'

@@ -48,6 +48,8 @@ steps:
       echo ""
       echo "Build Name:    ${{ parameters.buildName }}"
       echo "Project:       ${{ parameters.project }}"
+      echo "JFrog Conn:    ${{ parameters.jfrogConnection }}"
+      echo "JFrog URL:     ${{ parameters.jfrogUrl }}"
       echo ""
       echo "========================================="
       echo "  Enabled Features"

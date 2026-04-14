@@ -7,9 +7,13 @@ trigger: none
 resources:
   repositories:
     - repository: jfrog-templates
-      type: git
-      name: 'MyProject/jfrog-pipeline-templates'  # TODO: Update to your ADO project/repo
+      type: github
+      name: 'carmineacanfora/jfrog-ado-templates'  # TODO: Update if needed
+      endpoint: 'carmineacanfora'                    # TODO: Your GitHub service connection name
       ref: refs/heads/main
+
+pool:
+  vmImage: 'ubuntu-latest'
 
 extends:
   template: secured-pipeline.yml@jfrog-templates
@@ -17,15 +21,14 @@ extends:
     # =============================================================
     # REQUIRED — JFrog Connection
     # =============================================================
+    jfrogConnection: ''         # TODO: ADO service connection name, e.g., 'JFrog CLI - mycompany'
     jfrogUrl: ''                # TODO: e.g., 'mycompany.jfrog.io'
-    oidcProviderName: ''        # TODO: e.g., 'ado-oidc'
     buildName: ''               # TODO: e.g., 'my-app-build'
-    # oidcAudience: ''          # Only if your OIDC config requires it
     # project: ''               # JFrog project key (if using projects)
 
     # =============================================================
     # DEV PRE-BUILD STEPS
-    # Runs BEFORE JFrog CLI is available.
+    # Runs BEFORE any JFrog interaction.
     # Use for: checkout, Docker Buildx setup, Node install, etc.
     # JFrog CLI commands are BLOCKED in these steps.
     # =============================================================
@@ -42,8 +45,6 @@ extends:
 
     # =============================================================
     # NPM INSTALL
-    # Installs npm dependencies via JFrog Artifactory.
-    # Optionally runs Curation Audit if the install fails.
     # =============================================================
     # enableNpm: true
     # npmResolveRepo: ''        # TODO: e.g., 'my-npm-remote'
@@ -53,7 +54,6 @@ extends:
 
     # =============================================================
     # XRAY AUDIT — Source Code
-    # Scans local project dependencies for vulnerabilities.
     # =============================================================
     # enableXrayAudit: true
     # xrayPackageManager: 'npm'  # npm, maven, gradle, pip, go, nuget
@@ -61,19 +61,12 @@ extends:
 
     # =============================================================
     # DOCKER
-    # Auth and push are admin-controlled.
-    # Build is dev-controlled (provide dockerBuildSteps).
     # =============================================================
     # enableDockerAuth: true
     # enableDockerPush: true
     # dockerRepo: ''             # TODO: e.g., 'my-docker-local'
     # imageName: ''              # TODO: e.g., 'my-app'
     # imageTag: '$(Build.BuildId)'
-
-    # Docker Build Steps (dev-controlled):
-    # Build the image locally with --load (do NOT push).
-    # Tag must match: jfrogUrl/dockerRepo/imageName:imageTag
-    # 'docker push' and 'docker login' are BLOCKED in these steps.
     #
     # dockerBuildSteps:
     #   - script: |
@@ -86,7 +79,6 @@ extends:
 
     # =============================================================
     # UPLOAD GENERIC ARTIFACTS
-    # Upload files (release notes, docs, etc.) to Artifactory.
     # =============================================================
     # enableUploadGeneric: true
     # genericSourcePattern: ''   # TODO: e.g., 'docs/release-notes.pdf'
@@ -95,7 +87,6 @@ extends:
 
     # =============================================================
     # UPLOAD HELM CHARTS
-    # Upload packaged Helm charts to Artifactory.
     # =============================================================
     # enableUploadHelm: true
     # helmSourcePattern: 'helm/*.tgz'
@@ -104,7 +95,6 @@ extends:
 
     # =============================================================
     # BUILD INFO
-    # Collect environment/git info and publish to Artifactory.
     # =============================================================
     # enableCollectBuildInfo: true
     # enablePublishBuild: true
@@ -112,7 +102,6 @@ extends:
 
     # =============================================================
     # XRAY BUILD SCAN
-    # Scan the published build-info for vulnerabilities.
     # Requires enableCollectBuildInfo and enablePublishBuild.
     # =============================================================
     # enableBuildScan: true

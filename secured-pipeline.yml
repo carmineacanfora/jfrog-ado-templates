@@ -1,28 +1,28 @@
 # secured-pipeline.yml
 # Main extends template for JFrog Platform integration.
 # Admin-controlled — devs extend this and pass parameters.
-# Enforced via Required Template Check on service connections.
+# All JFrog interactions use JFrogCliV2@1 with OIDC via service connection.
 #
 # SECURITY LAYERS:
-#   Layer 1: JFrog CLI is installed AFTER dev preBuildSteps.
-#            Dev steps have no access to JFrog credentials.
+#   Layer 1: All JFrog commands run through JFrogCliV2@1 which handles
+#            OIDC auth per-task. Dev steps have no JFrog credentials.
 #   Layer 2: Dev steps (preBuildSteps, dockerBuildSteps) are validated
 #            at compile time. Any step containing JFrog CLI commands is blocked.
 #
 # PIPELINE FLOW:
-#   1. Print Inputs              (admin, always)
-#   2. Dev preBuildSteps         (dev, validated — no JFrog CLI available)
-#   3. JFrog CLI Setup           (admin, always)
-#   4. NPM Install               (admin, optional — curation audit on failure)
-#   5. Xray Audit                (admin, optional)
-#   6. Docker Authenticate       (admin, optional)
-#   7. Docker Build              (dev, validated — image built locally)
-#   8. Docker Push               (admin, optional — pushes and adds to build-info)
-#   9. Upload Generic            (admin, optional)
-#  10. Upload Helm Charts        (admin, optional)
-#  11. Collect Build Info        (admin, optional)
-#  12. Publish Build Info        (admin, optional — enforced --env-exclude)
-#  13. Xray Build Scan           (admin, optional)
+#   1.  Print Inputs              (admin, always)
+#   2.  Dev preBuildSteps         (dev, validated)
+#   3.  Verify JFrog Connection   (admin, always)
+#   4.  NPM Install               (admin, optional)
+#   5.  Xray Audit                (admin, optional)
+#   6.  Docker Authenticate       (admin, optional)
+#   7.  Docker Build              (dev, validated)
+#   8.  Docker Push               (admin, optional)
+#   9.  Upload Generic            (admin, optional)
+#  10.  Upload Helm Charts        (admin, optional)
+#  11.  Collect Build Info        (admin, optional)
+#  12.  Publish Build Info        (admin, optional)
+#  13.  Xray Build Scan           (admin, optional)
 
 parameters:
   # --- JFrog Connection ---
@@ -165,7 +165,6 @@ steps:
 
   # =============================================================
   # 2. Dev preBuildSteps (validated — Layer 2)
-  #    Runs BEFORE JFrog CLI is installed (Layer 1)
   # =============================================================
   - ${{ each step in parameters.preBuildSteps }}:
     - ${{ if step.script }}:
@@ -190,21 +189,19 @@ steps:
       - ${{ step }}
 
   # =============================================================
-  # 3. JFrog CLI Setup (admin, always — Layer 1)
-  #    Installed AFTER dev preBuildSteps
+  # 3. Verify JFrog Connection (admin, always)
   # =============================================================
   - template: stages/jfrog-setup.yml
     parameters:
       jfrogConnection: ${{ parameters.jfrogConnection }}
-      jfrogUrl: ${{ parameters.jfrogUrl }}
 
   # =============================================================
   # 4. NPM Install (admin, optional)
-  #    Curation Audit runs on failure if enabled by dev
   # =============================================================
   - ${{ if eq(parameters.enableNpm, true) }}:
     - template: stages/jfrog-npm-install.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         resolveRepo: ${{ parameters.npmResolveRepo }}
         buildName: ${{ parameters.buildName }}
         buildNumber: '$(Build.BuildId)'
@@ -212,7 +209,6 @@ steps:
         npmArguments: ${{ parameters.npmArguments }}
         threads: ${{ parameters.npmThreads }}
         enableCurationAudit: ${{ parameters.enableCurationAudit }}
-        installNode: false
 
   # =============================================================
   # 5. Xray Audit (admin, optional)
@@ -220,6 +216,7 @@ steps:
   - ${{ if eq(parameters.enableXrayAudit, true) }}:
     - template: stages/jfrog-xray-audit.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         packageManager: ${{ parameters.xrayPackageManager }}
         failBuild: ${{ parameters.xrayFailBuild }}
 
@@ -229,12 +226,11 @@ steps:
   - ${{ if eq(parameters.enableDockerAuth, true) }}:
     - template: stages/jfrog-docker-auth.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         jfrogUrl: ${{ parameters.jfrogUrl }}
 
   # =============================================================
   # 7. Docker Build (dev, validated — Layer 2)
-  #    Dev controls how the image is built.
-  #    Image must be tagged as: jfrogUrl/dockerRepo/imageName:imageTag
   # =============================================================
   - ${{ each step in parameters.dockerBuildSteps }}:
     - ${{ if step.script }}:
@@ -242,7 +238,6 @@ steps:
         - script: |
             echo "##[error]SECURITY VIOLATION: Unauthorized command detected in dockerBuildSteps."
             echo "##[error]Docker build steps must only build the image. Push is handled by the admin template."
-            echo "##[error]Docker login is handled by the Docker Authenticate template."
             exit 1
           displayName: 'BLOCKED: Unauthorized command in Docker Build'
       - ${{ else }}:
@@ -261,11 +256,11 @@ steps:
 
   # =============================================================
   # 8. Docker Push (admin, optional)
-  #    Pushes the image built by the dev and adds to build-info
   # =============================================================
   - ${{ if eq(parameters.enableDockerPush, true) }}:
     - template: stages/jfrog-docker-push.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         jfrogUrl: ${{ parameters.jfrogUrl }}
         dockerRepo: ${{ parameters.dockerRepo }}
         imageName: ${{ parameters.imageName }}
@@ -280,6 +275,7 @@ steps:
   - ${{ if eq(parameters.enableUploadGeneric, true) }}:
     - template: stages/jfrog-upload-generic.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         sourcePattern: ${{ parameters.genericSourcePattern }}
         targetRepo: ${{ parameters.genericTargetRepo }}
         buildName: ${{ parameters.buildName }}
@@ -293,6 +289,7 @@ steps:
   - ${{ if eq(parameters.enableUploadHelm, true) }}:
     - template: stages/jfrog-upload-helm.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         sourcePattern: ${{ parameters.helmSourcePattern }}
         targetRepo: ${{ parameters.helmTargetRepo }}
         buildName: ${{ parameters.buildName }}
@@ -306,16 +303,18 @@ steps:
   - ${{ if eq(parameters.enableCollectBuildInfo, true) }}:
     - template: stages/jfrog-collect-build-info.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         buildName: ${{ parameters.buildName }}
         buildNumber: '$(Build.BuildId)'
         project: ${{ parameters.project }}
 
   # =============================================================
-  # 12. Publish Build Info (admin, optional — enforced env-exclude)
+  # 12. Publish Build Info (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enablePublishBuild, true) }}:
     - template: stages/jfrog-publish-build.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         buildName: ${{ parameters.buildName }}
         buildNumber: '$(Build.BuildId)'
         project: ${{ parameters.project }}
@@ -327,6 +326,7 @@ steps:
   - ${{ if eq(parameters.enableBuildScan, true) }}:
     - template: stages/jfrog-build-scan.yml
       parameters:
+        jfrogConnection: ${{ parameters.jfrogConnection }}
         buildName: ${{ parameters.buildName }}
         buildNumber: '$(Build.BuildId)'
         project: ${{ parameters.project }}

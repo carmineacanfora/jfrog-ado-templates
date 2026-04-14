@@ -4,6 +4,8 @@
 # The --env-exclude is enforced here and cannot be overridden.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: buildName
     type: string
   - name: buildNumber
@@ -16,13 +18,8 @@ parameters:
     default: '*password*;*secret*;*key*;*token*;*credentials*;*ACCESS*;*PRIVATE*'
 
 steps:
-  - script: |
-      PROJECT_FLAG=""
-      if [ -n "${{ parameters.project }}" ]; then
-        PROJECT_FLAG="--project ${{ parameters.project }}"
-      fi
-
-      jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
-        $PROJECT_FLAG \
-        --env-exclude="${{ parameters.envExclude }}"
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --env-exclude="${{ parameters.envExclude }}"'
     displayName: 'Publish Build Info'

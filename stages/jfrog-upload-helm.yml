@@ -3,6 +3,8 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: sourcePattern
     type: string
     default: 'helm/*.tgz'
@@ -20,21 +22,8 @@ parameters:
     default: ''
 
 steps:
-  - script: |
-      MODULE_FLAG=""
-      if [ -n "${{ parameters.moduleName }}" ]; then
-        MODULE_FLAG="--module=${{ parameters.moduleName }}"
-      fi
-
-      PROJECT_FLAG=""
-      if [ -n "${{ parameters.project }}" ]; then
-        PROJECT_FLAG="--project=${{ parameters.project }}"
-      fi
-
-      jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" \
-        --flat \
-        $MODULE_FLAG \
-        --build-name="${{ parameters.buildName }}" \
-        --build-number="${{ parameters.buildNumber }}" \
-        $PROJECT_FLAG
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}"'
     displayName: 'Upload Helm Charts to ${{ parameters.targetRepo }}'

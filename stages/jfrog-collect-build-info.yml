@@ -3,6 +3,8 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: buildName
     type: string
   - name: buildNumber
@@ -12,20 +14,14 @@ parameters:
     default: ''
 
 steps:
-  - script: |
-      PROJECT_FLAG=""
-      if [ -n "${{ parameters.project }}" ]; then
-        PROJECT_FLAG="--project ${{ parameters.project }}"
-      fi
-
-      jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" $PROJECT_FLAG
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}"'
     displayName: 'Collect Build Environment'
 
-  - script: |
-      PROJECT_FLAG=""
-      if [ -n "${{ parameters.project }}" ]; then
-        PROJECT_FLAG="--project ${{ parameters.project }}"
-      fi
-
-      jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" $PROJECT_FLAG
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}"'
     displayName: 'Collect Git Info'

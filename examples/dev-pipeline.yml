@@ -1,28 +1,31 @@
-# Example: How a dev uses the admin templates
-# This file lives in the dev's repo (e.g., express-js-appbundle)
+# Example: How a dev uses the admin templates with OIDC
+# This file lives in the dev's repo
 
 trigger: none
 
 resources:
   repositories:
     - repository: jfrog-templates
-      type: git
-      name: 'MyProject/jfrog-pipeline-templates'
+      type: github
+      name: 'carmineacanfora/jfrog-ado-templates'
+      endpoint: 'carmineacanfora'
       ref: refs/heads/main
+
+pool:
+  vmImage: 'ubuntu-latest'
 
 extends:
   template: secured-pipeline.yml@jfrog-templates
   parameters:
     # --- JFrog Connection ---
+    jfrogConnection: 'JFrog CLI - solengeu'
     jfrogUrl: 'solengeu.jfrog.io'
-    oidcProviderName: 'carm-ado-oidc'
     project: 'carm'
 
     # --- Build Info ---
     buildName: 'ado-ejs-demo'
 
     # --- Dev preBuildSteps ---
-    # These run BEFORE JFrog CLI is installed — no JFrog access.
     preBuildSteps:
       - checkout: self
       - script: |
@@ -34,7 +37,7 @@ extends:
           version: '18.x'
         displayName: 'Install Node 18'
 
-    # --- NPM Install (with curation audit on failure) ---
+    # --- NPM Install ---
     enableNpm: true
     npmResolveRepo: 'carm-npmjs-remote'
     npmArguments: '--loglevel=notice'
@@ -49,9 +52,6 @@ extends:
     dockerRepo: 'carm-docker-dev-local'
     imageName: 'ejs'
 
-    # Dev controls how the image is built.
-    # Must tag as: jfrogUrl/dockerRepo/imageName:imageTag
-    # Must NOT push — admin template handles push.
     dockerBuildSteps:
       - script: |
           IMAGE_FULL="solengeu.jfrog.io/carm-docker-dev-local/ejs:$(Build.BuildId)"

@@ -4,6 +4,8 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: jfrogUrl
     type: string
   - name: dockerRepo
@@ -45,15 +47,8 @@ steps:
       echo "$IMAGE_FULL@$DIGEST" > metadata.json
     displayName: 'Docker Push'
 
-  - script: |
-      PROJECT_FLAG=""
-      if [ -n "${{ parameters.project }}" ]; then
-        PROJECT_FLAG="--project ${{ parameters.project }}"
-      fi
-
-      jf rt build-docker-create ${{ parameters.dockerRepo }} \
-        --image-file metadata.json \
-        --build-name "${{ parameters.buildName }}" \
-        --build-number "${{ parameters.buildNumber }}" \
-        $PROJECT_FLAG
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf rt build-docker-create ${{ parameters.dockerRepo }} --image-file metadata.json --build-name "${{ parameters.buildName }}" --build-number "${{ parameters.buildNumber }}"'
     displayName: 'Add Docker Image to Build Info'

@@ -1,5 +1,5 @@
 # stages/jfrog-setup.yml
-# Verifies JFrog connection via OIDC. 
+# Verifies JFrog connection via OIDC.
 # The JFrogCliV2@1 task handles CLI install and auth.
 # Admin-controlled — devs cannot modify.
 

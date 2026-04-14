@@ -3,6 +3,8 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: packageManager
     type: string
     default: 'npm'
@@ -18,7 +20,8 @@ parameters:
     default: true
 
 steps:
-  - script: |
-      jf audit --${{ parameters.packageManager }} \
-        --fail=${{ parameters.failBuild }}
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf audit --${{ parameters.packageManager }} --fail=${{ parameters.failBuild }}'
     displayName: 'Xray Audit - ${{ parameters.packageManager }}'
