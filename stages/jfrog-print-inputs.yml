@@ -59,7 +59,6 @@ steps:
       echo "  Resolve Repo:        ${{ parameters.npmResolveRepo }}"
       echo "  Curation Audit:      ${{ parameters.enableCurationAudit }}"
       echo "Xray Audit:            ${{ parameters.enableXrayAudit }}"
-      echo "Docker Auth:           ${{ parameters.enableDockerAuth }}"
       echo "Docker Push:           ${{ parameters.enableDockerPush }}"
       echo "  Docker Repo:         ${{ parameters.dockerRepo }}"
       echo "  Image Name:          ${{ parameters.imageName }}"

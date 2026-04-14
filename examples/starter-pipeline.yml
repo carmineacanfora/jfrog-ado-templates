@@ -62,7 +62,6 @@ extends:
     # =============================================================
     # DOCKER
     # =============================================================
-    # enableDockerAuth: true
     # enableDockerPush: true
     # dockerRepo: ''             # TODO: e.g., 'my-docker-local'
     # imageName: ''              # TODO: e.g., 'my-app'
