@@ -3,6 +3,8 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
+  - name: jfrogConnection
+    type: string
   - name: resolveRepo
     type: string
   - name: buildName
@@ -21,42 +23,34 @@ parameters:
   - name: enableCurationAudit
     type: boolean
     default: false
-  - name: installNode
-    type: boolean
-    default: true
-  - name: nodeVersion
-    type: string
-    default: '18.x'
 
 steps:
-  - ${{ if eq(parameters.installNode, true) }}:
-    - task: UseNode@1
-      inputs:
-        version: '${{ parameters.nodeVersion }}'
-      displayName: 'Install Node ${{ parameters.nodeVersion }}'
+  - task: JFrogCliV2@1
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf npmc --repo-resolve ${{ parameters.resolveRepo }}'
+    displayName: 'NPM Configure'
 
-  - script: |
-      PROJECT_FLAG=""
-      if [ -n "${{ parameters.project }}" ]; then
-        PROJECT_FLAG="--project=${{ parameters.project }}"
-      fi
-
-      jf npmc --repo-resolve ${{ parameters.resolveRepo }}
-
-      jf npm i ${{ parameters.npmArguments }} \
-        --build-name="${{ parameters.buildName }}" \
-        --build-number="${{ parameters.buildNumber }}" \
-        --threads=${{ parameters.threads }} \
-        $PROJECT_FLAG \
-      || {
-        CURATION_ENABLED="${{ parameters.enableCurationAudit }}"
-        if [ "$CURATION_ENABLED" = "True" ]; then
-          echo "##[warning]NPM Install failed. Running Curation Audit..."
-          jf curation-audit --threads=${{ parameters.threads }}
-        else
-          echo "##[warning]NPM Install failed. Curation Audit is disabled."
-        fi
-        echo "##[error]NPM Install failed. See above for details."
-        exit 1
-      }
+  - task: JFrogCliV2@1
+    continueOnError: true
+    name: npmInstall
+    inputs:
+      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+      command: 'jf npm i ${{ parameters.npmArguments }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --threads=${{ parameters.threads }}'
     displayName: 'NPM Install'
+
+  - ${{ if eq(parameters.enableCurationAudit, true) }}:
+    - task: JFrogCliV2@1
+      condition: not(eq(variables['Agent.JobStatus'], 'Succeeded'))
+      inputs:
+        jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
+        command: |
+          jf npmc --repo-resolve ${{ parameters.resolveRepo }}
+          jf curation-audit --threads=${{ parameters.threads }}
+      displayName: 'Curation Audit (on NPM failure)'
+
+    - script: |
+        echo "##[error]NPM Install failed. See Curation Audit results above."
+        exit 1
+      condition: not(eq(variables['Agent.JobStatus'], 'Succeeded'))
+      displayName: 'Fail pipeline after Curation Audit'
