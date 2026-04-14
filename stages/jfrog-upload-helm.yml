@@ -21,10 +21,20 @@ parameters:
 
 steps:
   - script: |
+      MODULE_FLAG=""
+      if [ -n "${{ parameters.moduleName }}" ]; then
+        MODULE_FLAG="--module=${{ parameters.moduleName }}"
+      fi
+
+      PROJECT_FLAG=""
+      if [ -n "${{ parameters.project }}" ]; then
+        PROJECT_FLAG="--project=${{ parameters.project }}"
+      fi
+
       jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" \
         --flat \
-        ${{ if ne(parameters.moduleName, '') }}--module="${{ parameters.moduleName }}"${{ endif }} \
+        $MODULE_FLAG \
         --build-name="${{ parameters.buildName }}" \
         --build-number="${{ parameters.buildNumber }}" \
-        ${{ if ne(parameters.project, '') }}--project=${{ parameters.project }}${{ endif }}
+        $PROJECT_FLAG
     displayName: 'Upload Helm Charts to ${{ parameters.targetRepo }}'
