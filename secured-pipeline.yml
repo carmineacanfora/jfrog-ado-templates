@@ -146,6 +146,8 @@ steps:
     parameters:
       buildName: ${{ parameters.buildName }}
       project: ${{ parameters.project }}
+      jfrogConnection: ${{ parameters.jfrogConnection }}
+      jfrogUrl: ${{ parameters.jfrogUrl }}
       enableNpm: ${{ parameters.enableNpm }}
       enableCurationAudit: ${{ parameters.enableCurationAudit }}
       npmResolveRepo: ${{ parameters.npmResolveRepo }}
@@ -193,9 +195,7 @@ steps:
   # =============================================================
   - template: stages/jfrog-setup.yml
     parameters:
-      jfrogUrl: ${{ parameters.jfrogUrl }}
-      oidcProviderName: ${{ parameters.oidcProviderName }}
-      oidcAudience: ${{ parameters.oidcAudience }}
+      jfrogConnection: ${{ parameters.jfrogConnection }}
 
   # =============================================================
   # 4. NPM Install (admin, optional)
