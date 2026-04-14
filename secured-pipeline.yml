@@ -149,7 +149,6 @@ steps:
       enableCurationAudit: ${{ parameters.enableCurationAudit }}
       npmResolveRepo: ${{ parameters.npmResolveRepo }}
       enableXrayAudit: ${{ parameters.enableXrayAudit }}
-      enableDockerAuth: ${{ parameters.enableDockerAuth }}
       enableDockerPush: ${{ parameters.enableDockerPush }}
       dockerRepo: ${{ parameters.dockerRepo }}
       imageName: ${{ parameters.imageName }}
