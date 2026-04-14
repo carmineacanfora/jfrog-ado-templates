@@ -26,17 +26,13 @@ parameters:
 
 steps:
   - task: JFrogCliV2@1
-    inputs:
-      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf npmc --repo-resolve ${{ parameters.resolveRepo }}'
-    displayName: 'NPM Configure'
-
-  - task: JFrogCliV2@1
     continueOnError: true
     name: npmInstall
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf npm i ${{ parameters.npmArguments }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --threads=${{ parameters.threads }}'
+      command: |
+        jf npmc --repo-resolve ${{ parameters.resolveRepo }}
+        jf npm i ${{ parameters.npmArguments }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --threads=${{ parameters.threads }}
     displayName: 'NPM Install'
 
   - ${{ if eq(parameters.enableCurationAudit, true) }}:
