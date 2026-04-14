@@ -5,6 +5,8 @@
 parameters:
   - name: jfrogConnection
     type: string
+  - name: jfrogUrl
+    type: string
 
 steps:
   - task: JFrogCliV2@1
@@ -17,14 +19,21 @@ steps:
   - script: |
       JF_PATH=$(find /opt/hostedtoolcache/jf -name "jf" -type f 2>/dev/null | head -1)
       if [ -z "$JF_PATH" ]; then
-        JF_PATH=$(which jf 2>/dev/null)
-      fi
-      if [ -z "$JF_PATH" ]; then
         echo "##[error]JFrog CLI not found"
         exit 1
       fi
       JF_DIR=$(dirname "$JF_PATH")
       echo "##vso[task.prependpath]$JF_DIR"
-      echo "JFrog CLI found at: $JF_PATH"
-      echo "Added $JF_DIR to PATH"
-    displayName: 'Add JFrog CLI to PATH'
+
+      # Re-configure the CLI with a persistent server ID
+      # using the OIDC token from the extension task
+      jf c add jfrog-server \
+        --url="https://${{ parameters.jfrogUrl }}/" \
+        --access-token="$(jfrogSetup.oidc_token)" \
+        --interactive=false
+      jf c use jfrog-server
+      echo "JFrog CLI version: $(jf --version)"
+      jf rt ping
+    displayName: 'Add JFrog CLI to PATH & Configure'
+    env:
+      JFROG_CLI_OIDC_TOKEN: $(jfrogSetup.oidc_token)
