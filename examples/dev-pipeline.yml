@@ -47,7 +47,6 @@ extends:
     enableXrayAudit: false
 
     # --- Docker ---
-    enableDockerAuth: true
     enableDockerPush: true
     dockerRepo: 'carm-docker-dev-local'
     imageName: 'ejs'
