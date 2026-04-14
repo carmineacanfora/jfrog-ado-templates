@@ -1,0 +1,23 @@
+# stages/jfrog-collect-build-info.yml
+# Collects environment variables and git info for build-info.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+
+steps:
+  - script: |
+      jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }}
+    displayName: 'Collect Build Environment'
+
+  - script: |
+      jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }}
+    displayName: 'Collect Git Info'

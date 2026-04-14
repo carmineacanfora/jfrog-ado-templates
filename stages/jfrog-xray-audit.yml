@@ -1,0 +1,24 @@
+# stages/jfrog-xray-audit.yml
+# Runs JFrog Xray Audit on the local project.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: packageManager
+    type: string
+    default: 'npm'
+    values:
+      - npm
+      - maven
+      - gradle
+      - pip
+      - go
+      - nuget
+  - name: failBuild
+    type: boolean
+    default: true
+
+steps:
+  - script: |
+      jf audit --${{ parameters.packageManager }} \
+        --fail=${{ parameters.failBuild }}
+    displayName: 'Xray Audit - ${{ parameters.packageManager }}'

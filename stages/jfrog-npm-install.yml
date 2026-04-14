@@ -1,0 +1,46 @@
+# stages/jfrog-npm-install.yml
+# NPM install via JFrog CLI with optional curation audit on failure.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: resolveRepo
+    type: string
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+  - name: npmArguments
+    type: string
+    default: ''
+  - name: threads
+    type: number
+    default: 5
+  - name: enableCurationAudit
+    type: boolean
+    default: false
+
+steps:
+  - script: |
+      jf npmc --repo-resolve ${{ parameters.resolveRepo }}
+
+      # Run npm install; if it fails and curation audit is enabled, run it
+      jf npm i ${{ parameters.npmArguments }} \
+        --build-name="${{ parameters.buildName }}" \
+        --build-number="${{ parameters.buildNumber }}" \
+        --threads=${{ parameters.threads }} \
+        ${{ if ne(parameters.project, '') }}--project=${{ parameters.project }}${{ endif }} \
+      || {
+        NPM_FAILED=1
+        ${{ if eq(parameters.enableCurationAudit, true) }}
+        echo "##[warning]NPM Install failed. Running Curation Audit..."
+        jf curation-audit --threads=${{ parameters.threads }}
+        ${{ else }}
+        echo "##[warning]NPM Install failed. Curation Audit is disabled."
+        ${{ endif }}
+        echo "##[error]NPM Install failed. See above for details."
+        exit 1
+      }
+    displayName: 'NPM Install'

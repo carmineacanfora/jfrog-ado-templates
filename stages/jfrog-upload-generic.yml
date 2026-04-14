@@ -1,0 +1,32 @@
+# stages/jfrog-upload-generic.yml
+# Upload generic artifacts to Artifactory via JFrog CLI.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: sourcePattern
+    type: string
+  - name: targetRepo
+    type: string
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+  - name: moduleName
+    type: string
+    default: ''
+  - name: flat
+    type: boolean
+    default: true
+
+steps:
+  - script: |
+      jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" \
+        ${{ if eq(parameters.flat, true) }}--flat${{ endif }} \
+        ${{ if ne(parameters.moduleName, '') }}--module="${{ parameters.moduleName }}"${{ endif }} \
+        --build-name="${{ parameters.buildName }}" \
+        --build-number="${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project=${{ parameters.project }}${{ endif }}
+    displayName: 'Upload to ${{ parameters.targetRepo }}'

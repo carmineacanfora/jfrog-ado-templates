@@ -1,0 +1,30 @@
+# stages/jfrog-upload-helm.yml
+# Upload Helm charts to Artifactory via JFrog CLI.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: sourcePattern
+    type: string
+    default: 'helm/*.tgz'
+  - name: targetRepo
+    type: string
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+  - name: moduleName
+    type: string
+    default: ''
+
+steps:
+  - script: |
+      jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" \
+        --flat \
+        ${{ if ne(parameters.moduleName, '') }}--module="${{ parameters.moduleName }}"${{ endif }} \
+        --build-name="${{ parameters.buildName }}" \
+        --build-number="${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project=${{ parameters.project }}${{ endif }}
+    displayName: 'Upload Helm Charts to ${{ parameters.targetRepo }}'

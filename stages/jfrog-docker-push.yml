@@ -1,0 +1,55 @@
+# stages/jfrog-docker-push.yml
+# Push Docker image and add to build-info via JFrog CLI.
+# Expects the image to be already built and available locally.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: jfrogUrl
+    type: string
+  - name: dockerRepo
+    type: string
+  - name: imageName
+    type: string
+  - name: imageTag
+    type: string
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+
+steps:
+  - script: |
+      IMAGE_FULL="${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }}"
+
+      docker push "$IMAGE_FULL"
+
+      # Capture the digest
+      DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_FULL" 2>/dev/null | cut -d'@' -f2)
+
+      if [ -z "$DIGEST" ]; then
+        DIGEST=$(docker inspect --format='{{.Id}}' "$IMAGE_FULL" | sed 's/sha256://')
+      fi
+
+      if [ -z "$DIGEST" ]; then
+        echo "##[error]Failed to capture Docker image digest."
+        exit 1
+      fi
+
+      echo "IMAGE_FULL=$IMAGE_FULL"
+      echo "DIGEST=$DIGEST"
+      echo "##vso[task.setvariable variable=DOCKER_IMAGE_FULL]$IMAGE_FULL"
+      echo "##vso[task.setvariable variable=DOCKER_DIGEST]$DIGEST"
+
+      echo "$IMAGE_FULL@$DIGEST" > metadata.json
+    displayName: 'Docker Push'
+
+  - script: |
+      jf rt build-docker-create ${{ parameters.dockerRepo }} \
+        --image-file metadata.json \
+        --build-name "${{ parameters.buildName }}" \
+        --build-number "${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }}
+    displayName: 'Add Docker Image to Build Info'

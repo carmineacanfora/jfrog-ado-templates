@@ -1,0 +1,12 @@
+# stages/jfrog-docker-auth.yml
+# Docker login to JFrog Artifactory via JFrog CLI.
+# Admin-controlled — devs cannot modify.
+
+parameters:
+  - name: jfrogUrl
+    type: string
+
+steps:
+  - script: |
+      jf docker login ${{ parameters.jfrogUrl }}
+    displayName: 'Docker Authenticate'

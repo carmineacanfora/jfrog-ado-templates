@@ -1,0 +1,23 @@
+# stages/jfrog-publish-build.yml
+# Publishes build-info to Artifactory.
+# Admin-controlled — devs cannot modify.
+# The --env-exclude is enforced here and cannot be overridden.
+
+parameters:
+  - name: buildName
+    type: string
+  - name: buildNumber
+    type: string
+  - name: project
+    type: string
+    default: ''
+  - name: envExclude
+    type: string
+    default: '*password*;*secret*;*key*;*token*;*credentials*;*ACCESS*;*PRIVATE*'
+
+steps:
+  - script: |
+      jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
+        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }} \
+        --env-exclude="${{ parameters.envExclude }}"
+    displayName: 'Publish Build Info'

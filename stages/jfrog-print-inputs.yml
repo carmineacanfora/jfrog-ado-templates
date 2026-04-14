@@ -1,0 +1,68 @@
+# stages/jfrog-print-inputs.yml
+# Prints pipeline configuration and what features are enabled.
+# Admin-controlled — always runs.
+
+parameters:
+  - name: buildName
+    type: string
+  - name: project
+    type: string
+  - name: enableNpm
+    type: boolean
+  - name: enableCurationAudit
+    type: boolean
+  - name: npmResolveRepo
+    type: string
+  - name: enableXrayAudit
+    type: boolean
+  - name: enableDockerAuth
+    type: boolean
+  - name: enableDockerPush
+    type: boolean
+  - name: dockerRepo
+    type: string
+  - name: imageName
+    type: string
+  - name: imageTag
+    type: string
+  - name: enableUploadGeneric
+    type: boolean
+  - name: enableUploadHelm
+    type: boolean
+  - name: enableCollectBuildInfo
+    type: boolean
+  - name: enablePublishBuild
+    type: boolean
+  - name: enableBuildScan
+    type: boolean
+
+steps:
+  - script: |
+      echo "========================================="
+      echo "  Pipeline Configuration"
+      echo "========================================="
+      echo ""
+      echo "Build Name:    ${{ parameters.buildName }}"
+      echo "Project:       ${{ parameters.project }}"
+      echo ""
+      echo "========================================="
+      echo "  Enabled Features"
+      echo "========================================="
+      echo ""
+      echo "NPM Install:           ${{ parameters.enableNpm }}"
+      echo "  Resolve Repo:        ${{ parameters.npmResolveRepo }}"
+      echo "  Curation Audit:      ${{ parameters.enableCurationAudit }}"
+      echo "Xray Audit:            ${{ parameters.enableXrayAudit }}"
+      echo "Docker Auth:           ${{ parameters.enableDockerAuth }}"
+      echo "Docker Push:           ${{ parameters.enableDockerPush }}"
+      echo "  Docker Repo:         ${{ parameters.dockerRepo }}"
+      echo "  Image Name:          ${{ parameters.imageName }}"
+      echo "  Image Tag:           ${{ parameters.imageTag }}"
+      echo "Upload Generic:        ${{ parameters.enableUploadGeneric }}"
+      echo "Upload Helm:           ${{ parameters.enableUploadHelm }}"
+      echo "Collect Build Info:    ${{ parameters.enableCollectBuildInfo }}"
+      echo "Publish Build:         ${{ parameters.enablePublishBuild }}"
+      echo "Xray Build Scan:       ${{ parameters.enableBuildScan }}"
+      echo ""
+      echo "========================================="
+    displayName: 'Print Pipeline Configuration'
