@@ -23,5 +23,5 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf build-scan "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --fail=${{ parameters.failBuild }} --vuln=${{ parameters.vuln }}'
+      command: 'jf build-scan "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --fail=${{ parameters.failBuild }} --project ${{ parameters.project }} --vuln=${{ parameters.vuln }}'
     displayName: 'Scan Build'

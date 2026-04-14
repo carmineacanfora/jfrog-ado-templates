@@ -1,4 +1,4 @@
-# stages/jfrog-collect-build-info.yml
+# stages/jfrog-build-collect-info.yml
 # Collects environment variables and git info for build-info.
 # Admin-controlled — devs cannot modify.
 
@@ -17,7 +17,7 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}"'
+      command: 'jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}'
     displayName: 'Collect Build Environment'
 
   - task: JFrogCliV2@1

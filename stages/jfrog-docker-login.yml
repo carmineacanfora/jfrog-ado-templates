@@ -1,4 +1,4 @@
-# stages/jfrog-docker-auth.yml
+# stages/jfrog-docker-login.yml
 # Docker login to JFrog Artifactory via JFrog CLI.
 # Admin-controlled — devs cannot modify.
 

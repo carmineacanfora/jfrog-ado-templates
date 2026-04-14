@@ -1,4 +1,4 @@
-# stages/jfrog-publish-build.yml
+# stages/jfrog-build-publish.yml
 # Publishes build-info to Artifactory.
 # Admin-controlled — devs cannot modify.
 # The --env-exclude is enforced here and cannot be overridden.

@@ -1,4 +1,4 @@
-# stages/jfrog-upload-generic.yml
+# stages/jfrog-generic-push.yml
 # Upload generic artifacts to Artifactory via JFrog CLI.
 # Admin-controlled — devs cannot modify.
 
@@ -27,5 +27,5 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat=${{ parameters.flat }} --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}"'
+      command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat=${{ parameters.flat }} --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --project ${{ parameters.project }}'
     displayName: 'Push Generic Artifact'

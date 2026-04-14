@@ -154,13 +154,13 @@ extends:
 | `stages/jfrog-print-inputs.yml` | Prints pipeline configuration |
 | `stages/jfrog-setup.yml` | Installs and configures JFrog CLI via OIDC |
 | `stages/jfrog-npm-install.yml` | NPM install with optional curation audit |
-| `stages/jfrog-xray-audit.yml` | Xray source code audit |
-| `stages/jfrog-docker-auth.yml` | Docker login to JFrog |
+| `stages/jfrog-xray-scan.yml` | Xray source code audit |
+| `stages/jfrog-docker-login.yml` | Docker login to JFrog |
 | `stages/jfrog-docker-push.yml` | Docker push and build-info |
-| `stages/jfrog-upload-generic.yml` | Generic artifact upload |
-| `stages/jfrog-upload-helm.yml` | Helm chart upload |
-| `stages/jfrog-collect-build-info.yml` | Collect environment and git info |
-| `stages/jfrog-publish-build.yml` | Publish build-info (enforced env-exclude) |
+| `stages/jfrog-generic-push.yml` | Generic artifact upload |
+| `stages/jfrog-helm-push.yml` | Helm chart upload |
+| `stages/jfrog-build-collect-info.yml` | Collect environment and git info |
+| `stages/jfrog-build-publish.yml` | Publish build-info (enforced env-exclude) |
 | `stages/jfrog-build-scan.yml` | Xray build scan |
 
 ## Dev Step Restrictions

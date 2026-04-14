@@ -50,5 +50,5 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf rt build-docker-create ${{ parameters.dockerRepo }} --image-file metadata.json --build-name "${{ parameters.buildName }}" --build-number "${{ parameters.buildNumber }}"'
+      command: 'jf rt build-docker-create ${{ parameters.dockerRepo }} --image-file metadata.json --build-name "${{ parameters.buildName }}" --build-number "${{ parameters.buildNumber }} --project ${{ parameters.project }}"'
     displayName: 'Add Docker Image to Build Info'

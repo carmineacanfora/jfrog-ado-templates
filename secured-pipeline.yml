@@ -214,7 +214,7 @@ steps:
   # 5. Xray Audit (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableXrayAudit, true) }}:
-    - template: stages/jfrog-xray-audit.yml
+    - template: stages/jfrog-xray-scan.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         packageManager: ${{ parameters.xrayPackageManager }}
@@ -224,7 +224,7 @@ steps:
   # 6. Docker Authenticate (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableDockerAuth, true) }}:
-    - template: stages/jfrog-docker-auth.yml
+    - template: stages/jfrog-docker-login.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         jfrogUrl: ${{ parameters.jfrogUrl }}
@@ -273,7 +273,7 @@ steps:
   # 9. Upload Generic (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableUploadGeneric, true) }}:
-    - template: stages/jfrog-upload-generic.yml
+    - template: stages/jfrog-generic-push.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         sourcePattern: ${{ parameters.genericSourcePattern }}
@@ -287,7 +287,7 @@ steps:
   # 10. Upload Helm Charts (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableUploadHelm, true) }}:
-    - template: stages/jfrog-upload-helm.yml
+    - template: stages/jfrog-helm-push.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         sourcePattern: ${{ parameters.helmSourcePattern }}
@@ -301,7 +301,7 @@ steps:
   # 11. Collect Build Info (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableCollectBuildInfo, true) }}:
-    - template: stages/jfrog-collect-build-info.yml
+    - template: stages/jfrog-build-collect-info.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         buildName: ${{ parameters.buildName }}
@@ -312,7 +312,7 @@ steps:
   # 12. Publish Build Info (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enablePublishBuild, true) }}:
-    - template: stages/jfrog-publish-build.yml
+    - template: stages/jfrog-build-publish.yml
       parameters:
         jfrogConnection: ${{ parameters.jfrogConnection }}
         buildName: ${{ parameters.buildName }}

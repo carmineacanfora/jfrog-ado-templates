@@ -1,4 +1,4 @@
-# stages/jfrog-xray-audit.yml
+# stages/jfrog-xray-scan.yml
 # Runs JFrog Xray Audit on the local project.
 # Admin-controlled — devs cannot modify.
 
