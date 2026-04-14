@@ -13,3 +13,18 @@ steps:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: 'jf rt ping'
     displayName: 'Configure JFrog CLI (OIDC)'
+
+  - script: |
+      JF_PATH=$(find /opt/hostedtoolcache/jf -name "jf" -type f 2>/dev/null | head -1)
+      if [ -z "$JF_PATH" ]; then
+        JF_PATH=$(which jf 2>/dev/null)
+      fi
+      if [ -z "$JF_PATH" ]; then
+        echo "##[error]JFrog CLI not found"
+        exit 1
+      fi
+      JF_DIR=$(dirname "$JF_PATH")
+      echo "##vso[task.prependpath]$JF_DIR"
+      echo "JFrog CLI found at: $JF_PATH"
+      echo "Added $JF_DIR to PATH"
+    displayName: 'Add JFrog CLI to PATH'
