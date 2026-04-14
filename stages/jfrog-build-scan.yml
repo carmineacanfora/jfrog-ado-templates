@@ -19,8 +19,18 @@ parameters:
 
 steps:
   - script: |
+      PROJECT_FLAG=""
+      if [ -n "${{ parameters.project }}" ]; then
+        PROJECT_FLAG="--project=${{ parameters.project }}"
+      fi
+
+      VULN_FLAG=""
+      if [ "${{ parameters.vuln }}" = "True" ]; then
+        VULN_FLAG="--vuln"
+      fi
+
       jf build-scan "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
-        ${{ if ne(parameters.project, '') }}--project=${{ parameters.project }}${{ endif }} \
+        $PROJECT_FLAG \
         --fail=${{ parameters.failBuild }} \
-        ${{ if eq(parameters.vuln, true) }}--vuln${{ endif }}
+        $VULN_FLAG
     displayName: 'Xray Build Scan'
