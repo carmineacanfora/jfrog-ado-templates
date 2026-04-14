@@ -14,11 +14,19 @@ parameters:
 steps:
   - script: |
       curl -fL https://install-cli.jfrog.io | sh
-      jf c add jfrog-server \
-        --url="https://${{ parameters.jfrogUrl }}/" \
-        --oidc-provider-name="${{ parameters.oidcProviderName }}" \
-        ${{ if ne(parameters.oidcAudience, '') }}--oidc-audience="${{ parameters.oidcAudience }}"${{ endif }} \
-        --interactive=false
+      OIDC_AUDIENCE="${{ parameters.oidcAudience }}"
+      if [ -n "$OIDC_AUDIENCE" ]; then
+        jf c add jfrog-server \
+          --url="https://${{ parameters.jfrogUrl }}/" \
+          --oidc-provider-name="${{ parameters.oidcProviderName }}" \
+          --oidc-audience="$OIDC_AUDIENCE" \
+          --interactive=false
+      else
+        jf c add jfrog-server \
+          --url="https://${{ parameters.jfrogUrl }}/" \
+          --oidc-provider-name="${{ parameters.oidcProviderName }}" \
+          --interactive=false
+      fi
       jf c use jfrog-server
       echo "JFrog CLI version: $(jf --version)"
     displayName: 'Install & Configure JFrog CLI (OIDC)'
