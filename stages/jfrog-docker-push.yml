@@ -4,7 +4,7 @@
 # Admin-controlled — devs cannot modify.
 
 parameters:
-  - name: jfrogConnection
+  - name: jfrogArtifactoryConnection
     type: string
   - name: jfrogUrl
     type: string
@@ -26,7 +26,7 @@ steps:
   - task: JFrogDocker@1
     inputs:
       command: 'Push'
-      artifactoryConnection: '${{ parameters.jfrogConnection }}'
+      artifactoryConnection: '${{ parameters.jfrogArtifactoryConnection }}'
       imageName: '${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }}'
       collectBuildInfo: true
       buildName: '${{ parameters.buildName }}'

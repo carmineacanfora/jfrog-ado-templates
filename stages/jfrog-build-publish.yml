@@ -4,7 +4,7 @@
 # The --env-exclude is enforced here and cannot be overridden.
 
 parameters:
-  - name: jfrogConnection
+  - name: jfrogArtifactoryConnection
     type: string
   - name: buildName
     type: string
@@ -20,7 +20,7 @@ parameters:
 steps:
   - task: JFrogPublishBuildInfo@1
     inputs:
-      artifactoryConnection: '${{ parameters.jfrogConnection }}'
+      artifactoryConnection: '${{ parameters.jfrogArtifactoryConnection }}'
       buildName: '${{ parameters.buildName }}'
       buildNumber: '${{ parameters.buildNumber }}'
       projectKey: '${{ parameters.project }}'
