@@ -214,6 +214,7 @@ steps:
         npmArguments: ${{ parameters.npmArguments }}
         threads: ${{ parameters.npmThreads }}
         enableCurationAudit: ${{ parameters.enableCurationAudit }}
+        installNode: false
 
   # =============================================================
   # 5. Xray Audit (admin, optional)
