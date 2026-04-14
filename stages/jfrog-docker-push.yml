@@ -23,10 +23,13 @@ parameters:
     default: ''
 
 steps:
-  - task: JFrogCliV2@1
+  - task: JFrogDocker@1
     inputs:
-      jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: |
-        jf docker login ${{ parameters.jfrogUrl }}
-        jf docker push ${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }} --project=${{ parameters.project }}"
+      command: 'Push'
+      artifactoryConnection: '${{ parameters.jfrogConnection }}'
+      imageName: '${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }}'
+      collectBuildInfo: true
+      buildName: '${{ parameters.buildName }}'
+      buildNumber: '${{ parameters.buildNumber }}'
+      projectKey: '${{ parameters.project }}'
     displayName: 'Push Docker Image'
