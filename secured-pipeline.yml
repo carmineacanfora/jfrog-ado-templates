@@ -28,6 +28,8 @@ parameters:
   # --- JFrog Connection ---
   - name: jfrogConnection
     type: string
+  - name: jfrogArtifactoryConnection
+    type: string
   - name: jfrogUrl
     type: string
   - name: project
@@ -243,7 +245,7 @@ steps:
   - ${{ if eq(parameters.enableDockerPush, true) }}:
     - template: stages/jfrog-docker-push.yml
       parameters:
-        jfrogConnection: ${{ parameters.jfrogConnection }}
+        jfrogConnection: ${{ parameters.jfrogArtifactoryConnection }}
         jfrogUrl: ${{ parameters.jfrogUrl }}
         dockerRepo: ${{ parameters.dockerRepo }}
         imageName: ${{ parameters.imageName }}
@@ -286,7 +288,7 @@ steps:
   - ${{ if eq(parameters.enablePublishBuild, true) }}:
     - template: stages/jfrog-build-publish.yml
       parameters:
-        jfrogConnection: ${{ parameters.jfrogConnection }}
+        jfrogConnection: ${{ parameters.jfrogArtifactoryConnection }}
         buildName: ${{ parameters.buildName }}
         buildNumber: '$(Build.BuildId)'
         project: ${{ parameters.project }}
