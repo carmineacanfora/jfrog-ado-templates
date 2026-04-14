@@ -13,11 +13,19 @@ parameters:
 
 steps:
   - script: |
-      jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
-        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }}
+      PROJECT_FLAG=""
+      if [ -n "${{ parameters.project }}" ]; then
+        PROJECT_FLAG="--project ${{ parameters.project }}"
+      fi
+
+      jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" $PROJECT_FLAG
     displayName: 'Collect Build Environment'
 
   - script: |
-      jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" \
-        ${{ if ne(parameters.project, '') }}--project ${{ parameters.project }}${{ endif }}
+      PROJECT_FLAG=""
+      if [ -n "${{ parameters.project }}" ]; then
+        PROJECT_FLAG="--project ${{ parameters.project }}"
+      fi
+
+      jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" $PROJECT_FLAG
     displayName: 'Collect Git Info'
