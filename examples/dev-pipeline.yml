@@ -58,14 +58,11 @@ extends:
     # Must tag as: jfrogUrl/dockerRepo/imageName:imageTag
     # Must NOT push — admin template handles push.
     dockerBuildSteps:
-      - script: |
-          IMAGE_FULL="solengeu.jfrog.io/carm-docker-dev-local/ejs:$(Build.BuildId)"
-          docker buildx build \
-            --tag "$IMAGE_FULL" \
-            --provenance=false \
-            --load \
-            .
-        displayName: 'Build Docker Image'
+    - script: |
+        docker build \
+          --tag "solengeu.jfrog.io/carm-docker-dev-local/ejs:$(Build.BuildId)" \
+          .
+      displayName: 'Build Docker Image'
 
     # --- Uploads ---
     enableUploadGeneric: true

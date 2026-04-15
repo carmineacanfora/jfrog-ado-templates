@@ -17,6 +17,9 @@ parameters:
     type: string
   - name: buildNumber
     type: string
+  - name: threads
+    type: number
+    default: 8
   - name: project
     type: string
     default: ''
@@ -27,5 +30,5 @@ steps:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: |
         jf docker login ${{ parameters.jfrogUrl }}
-        jf docker push ${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --project=${{ parameters.project }}
+        jf docker push ${{ parameters.jfrogUrl }}/${{ parameters.dockerRepo }}/${{ parameters.imageName }}:${{ parameters.imageTag }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --project=${{ parameters.project }} --threads=${{ parameters.threads }}
     displayName: 'Push Docker Image'
