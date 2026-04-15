@@ -18,11 +18,11 @@ parameters:
     default: '*password*;*secret*;*key*;*token*;*credentials*;*ACCESS*;*PRIVATE*'
 
 steps:
-  - task: JFrogPublishBuildInfo@1
+  - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      buildName: '${{ parameters.buildName }}'
-      buildNumber: '${{ parameters.buildNumber }}'
-      projectKey: '${{ parameters.project }}'
-      excludeEnvVars: '${{ parameters.envExclude }}'
+      command: |
+        jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}
+        jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}
+        jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }} --env-exclude="${{ parameters.envExclude }}"
     displayName: 'Publish Build Info'
