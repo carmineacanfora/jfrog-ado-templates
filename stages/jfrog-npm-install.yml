@@ -19,7 +19,7 @@ parameters:
     default: ''
   - name: threads
     type: number
-    default: 5
+    default: 8
   - name: enableCurationAudit
     type: boolean
     default: false
@@ -32,7 +32,7 @@ steps:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: |
         jf npmc --repo-resolve ${{ parameters.resolveRepo }}
-        jf npm i ${{ parameters.npmArguments }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --threads=${{ parameters.threads }} --project=${{ parameters.project }}
+        jf npm i ${{ parameters.npmArguments }} --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --threads=${{ parameters.threads }}
     displayName: 'NPM Install'
 
   - ${{ if eq(parameters.enableCurationAudit, true) }}:
