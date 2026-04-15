@@ -1,7 +1,7 @@
 # stages/jfrog-build-publish.yml
-# Publishes build-info to Artifactory.
+# Collects env vars, git info, and publishes build-info to Artifactory.
+# The --env-exclude is admin-enforced and cannot be overridden by devs.
 # Admin-controlled — devs cannot modify.
-# The --env-exclude is enforced here and cannot be overridden.
 
 parameters:
   - name: jfrogConnection
@@ -22,7 +22,7 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: |
-        jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}
-        jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }}
-        jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project ${{ parameters.project }} --env-exclude="${{ parameters.envExclude }}" --build-url="$(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
+        jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }}
+        jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }}
+        jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }} --env-exclude="${{ parameters.envExclude }}" --build-url="$(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
     displayName: 'Publish Build Info'

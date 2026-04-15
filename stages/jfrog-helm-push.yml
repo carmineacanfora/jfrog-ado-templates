@@ -1,5 +1,5 @@
 # stages/jfrog-helm-push.yml
-# Upload Helm charts to Artifactory via JFrog CLI.
+# Upload Helm charts to Artifactory.
 # Admin-controlled — devs cannot modify.
 
 parameters:
@@ -25,5 +25,5 @@ steps:
   - task: JFrogCliV2@1
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
-      command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --project ${{ parameters.project }}'
+      command: 'jf rt u "${{ parameters.sourcePattern }}" "${{ parameters.targetRepo }}/" --flat --module="${{ parameters.moduleName }}" --build-name="${{ parameters.buildName }}" --build-number="${{ parameters.buildNumber }}" --project=${{ parameters.project }}'
     displayName: 'Push Helm Charts'

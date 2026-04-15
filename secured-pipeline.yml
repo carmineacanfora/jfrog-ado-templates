@@ -3,26 +3,24 @@
 # Admin-controlled — devs extend this and pass parameters.
 # All JFrog interactions use JFrogCliV2@1 with OIDC via service connection.
 #
-# SECURITY LAYERS:
+# SECURITY:
 #   Layer 1: All JFrog commands run through JFrogCliV2@1 which handles
 #            OIDC auth per-task. Dev steps have no JFrog credentials.
 #   Layer 2: Dev steps (preBuildSteps, dockerBuildSteps) are validated
-#            at compile time. Any step containing JFrog CLI commands is blocked.
+#            at compile time. Steps containing JFrog CLI commands are blocked.
 #
 # PIPELINE FLOW:
 #   1.  Print Inputs              (admin, always)
 #   2.  Dev preBuildSteps         (dev, validated)
 #   3.  Verify JFrog Connection   (admin, always)
-#   4.  NPM Install               (admin, optional)
+#   4.  NPM Install               (admin, optional — curation audit on failure)
 #   5.  Xray Audit                (admin, optional)
-#   6.  Docker Authenticate       (admin, optional)
-#   7.  Docker Build              (dev, validated)
-#   8.  Docker Push               (admin, optional)
-#   9.  Upload Generic            (admin, optional)
-#  10.  Upload Helm Charts        (admin, optional)
-#  11.  Collect Build Info        (admin, optional)
-#  12.  Publish Build Info        (admin, optional)
-#  13.  Xray Build Scan           (admin, optional)
+#   6.  Docker Build              (dev, validated)
+#   7.  Docker Push               (admin, optional — includes login + build-info)
+#   8.  Upload Generic            (admin, optional)
+#   9.  Upload Helm Charts        (admin, optional)
+#  10.  Publish Build Info        (admin, optional — includes env/git collection)
+#  11.  Xray Build Scan           (admin, optional)
 
 parameters:
   # --- JFrog Connection ---
@@ -61,7 +59,7 @@ parameters:
     default: ''
   - name: npmThreads
     type: number
-    default: 5
+    default: 8
   - name: enableCurationAudit
     type: boolean
     default: false
@@ -213,7 +211,7 @@ steps:
         failBuild: ${{ parameters.xrayFailBuild }}
 
   # =============================================================
-  # 7. Docker Build (dev, validated — Layer 2)
+  # 6. Docker Build (dev, validated — Layer 2)
   # =============================================================
   - ${{ each step in parameters.dockerBuildSteps }}:
     - ${{ if step.script }}:
@@ -238,7 +236,7 @@ steps:
       - ${{ step }}
 
   # =============================================================
-  # 8. Docker Push (admin, optional)
+  # 7. Docker Push (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableDockerPush, true) }}:
     - template: stages/jfrog-docker-push.yml
@@ -253,7 +251,7 @@ steps:
         project: ${{ parameters.project }}
 
   # =============================================================
-  # 9. Upload Generic (admin, optional)
+  # 8. Upload Generic (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableUploadGeneric, true) }}:
     - template: stages/jfrog-generic-push.yml
@@ -267,7 +265,7 @@ steps:
         moduleName: ${{ parameters.genericModuleName }}
 
   # =============================================================
-  # 10. Upload Helm Charts (admin, optional)
+  # 9. Upload Helm Charts (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableUploadHelm, true) }}:
     - template: stages/jfrog-helm-push.yml
@@ -281,7 +279,7 @@ steps:
         moduleName: ${{ parameters.helmModuleName }}
 
   # =============================================================
-  # 11. Collect & Publish Build Info (admin, optional)
+  # 10. Publish Build Info (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enablePublishBuild, true) }}:
     - template: stages/jfrog-build-publish.yml
@@ -293,7 +291,7 @@ steps:
         envExclude: ${{ parameters.envExclude }}
 
   # =============================================================
-  # 13. Xray Build Scan (admin, optional)
+  # 11. Xray Build Scan (admin, optional)
   # =============================================================
   - ${{ if eq(parameters.enableBuildScan, true) }}:
     - template: stages/jfrog-build-scan.yml

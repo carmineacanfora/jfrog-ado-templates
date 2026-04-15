@@ -1,8 +1,10 @@
 # Example: How a dev uses the admin templates with OIDC
-# This file lives in the dev's repo
+# Pipeline built from the JFrog Pipeline Templates for Azure DevOps:
+# https://github.com/carmineacanfora/jfrog-ado-templates
 
 trigger: none
 
+# Read-only repo containing the JFrog ADO Templates managed by the Platform Team
 resources:
   repositories:
     - repository: jfrog-templates
@@ -18,7 +20,7 @@ extends:
   template: secured-pipeline.yml@jfrog-templates
   parameters:
     # --- JFrog Connection ---
-    jfrogConnection: 'JFrog CLI - solengeu'
+    jfrogConnection: 'JFrog Platform - solengeu OIDC'
     jfrogUrl: 'solengeu.jfrog.io'
     project: 'carm'
 
@@ -26,6 +28,7 @@ extends:
     buildName: 'ado-ejs-demo'
 
     # --- Dev preBuildSteps ---
+    # These run BEFORE JFrog CLI is available — no JFrog access.
     preBuildSteps:
       - checkout: self
       - script: |
@@ -37,7 +40,7 @@ extends:
           version: '18.x'
         displayName: 'Setup Node'
 
-    # --- NPM Install ---
+    # --- NPM Install (with curation audit on failure) ---
     enableNpm: true
     npmResolveRepo: 'carm-npmjs-remote'
     npmArguments: '--loglevel=notice'
@@ -51,6 +54,9 @@ extends:
     dockerRepo: 'carm-docker-dev-local'
     imageName: 'ejs'
 
+    # Dev controls how the image is built.
+    # Must tag as: jfrogUrl/dockerRepo/imageName:imageTag
+    # Must NOT push — admin template handles push.
     dockerBuildSteps:
       - script: |
           IMAGE_FULL="solengeu.jfrog.io/carm-docker-dev-local/ejs:$(Build.BuildId)"
@@ -72,7 +78,6 @@ extends:
     helmModuleName: 'helm_charts:$(Build.BuildId)'
 
     # --- Build Info ---
-    enableCollectBuildInfo: true
     enablePublishBuild: true
 
     # --- Build Scan ---

@@ -1,14 +1,18 @@
 # Starter Pipeline Template
 # Copy this file to your repo and uncomment the features you need.
 # See README.md for full documentation of all parameters.
+#
+# Pipeline built from the JFrog Pipeline Templates for Azure DevOps:
+# https://github.com/carmineacanfora/jfrog-ado-templates
 
 trigger: none
 
+# Read-only repo containing the JFrog ADO Templates managed by the Platform Team
 resources:
   repositories:
     - repository: jfrog-templates
       type: github
-      name: 'carmineacanfora/jfrog-ado-templates'  # TODO: Update if needed
+      name: 'carmineacanfora/jfrog-ado-templates'  # TODO: Update if hosted elsewhere
       endpoint: 'carmineacanfora'                    # TODO: Your GitHub service connection name
       ref: refs/heads/main
 
@@ -21,7 +25,7 @@ extends:
     # =============================================================
     # REQUIRED — JFrog Connection
     # =============================================================
-    jfrogConnection: ''         # TODO: ADO service connection name, e.g., 'JFrog CLI - mycompany'
+    jfrogConnection: ''         # TODO: ADO service connection name (JFrog Platform V2 with OIDC)
     jfrogUrl: ''                # TODO: e.g., 'mycompany.jfrog.io'
     buildName: ''               # TODO: e.g., 'my-app-build'
     # project: ''               # JFrog project key (if using projects)
@@ -37,14 +41,16 @@ extends:
       # - script: |
       #     docker buildx create --use --name mybuilder
       #     docker buildx inspect --bootstrap
-      #   displayName: 'Set up Docker Buildx'
+      #   displayName: 'Setup Docker Buildx'
       # - task: UseNode@1
       #   inputs:
       #     version: '18.x'
-      #   displayName: 'Install Node 18'
+      #   displayName: 'Setup Node'
 
     # =============================================================
     # NPM INSTALL
+    # Installs npm dependencies via JFrog Artifactory.
+    # Optionally runs Curation Audit if the install fails.
     # =============================================================
     # enableNpm: true
     # npmResolveRepo: ''        # TODO: e.g., 'my-npm-remote'
@@ -53,7 +59,8 @@ extends:
     # enableCurationAudit: true  # Run curation audit on npm failure
 
     # =============================================================
-    # XRAY AUDIT — Source Code
+    # XRAY AUDIT — Scan Code
+    # Scans local project dependencies for vulnerabilities.
     # =============================================================
     # enableXrayAudit: true
     # xrayPackageManager: 'npm'  # npm, maven, gradle, pip, go, nuget
@@ -61,23 +68,32 @@ extends:
 
     # =============================================================
     # DOCKER
+    # Push is admin-controlled.
+    # Build is dev-controlled (provide dockerBuildSteps).
     # =============================================================
     # enableDockerPush: true
     # dockerRepo: ''             # TODO: e.g., 'my-docker-local'
     # imageName: ''              # TODO: e.g., 'my-app'
     # imageTag: '$(Build.BuildId)'
     #
+    # Docker Build Steps (dev-controlled):
+    # Build the image locally with --load (do NOT push).
+    # Tag must match: jfrogUrl/dockerRepo/imageName:imageTag
+    # 'docker push' and 'docker login' are BLOCKED in these steps.
+    #
     # dockerBuildSteps:
     #   - script: |
+    #       IMAGE_FULL="mycompany.jfrog.io/my-docker-local/my-app:$(Build.BuildId)"
     #       docker buildx build \
-    #         --tag "mycompany.jfrog.io/my-docker-local/my-app:$(Build.BuildId)" \
+    #         --tag "$IMAGE_FULL" \
     #         --provenance=false \
     #         --load \
     #         .
-    #     displayName: 'Docker Build'
+    #     displayName: 'Build Docker Image'
 
     # =============================================================
     # UPLOAD GENERIC ARTIFACTS
+    # Upload files (release notes, docs, etc.) to Artifactory.
     # =============================================================
     # enableUploadGeneric: true
     # genericSourcePattern: ''   # TODO: e.g., 'docs/release-notes.pdf'
@@ -86,6 +102,7 @@ extends:
 
     # =============================================================
     # UPLOAD HELM CHARTS
+    # Upload packaged Helm charts to Artifactory.
     # =============================================================
     # enableUploadHelm: true
     # helmSourcePattern: 'helm/*.tgz'
@@ -94,14 +111,16 @@ extends:
 
     # =============================================================
     # BUILD INFO
+    # Collect environment/git info and publish to Artifactory.
+    # The --env-exclude pattern is admin-enforced and cannot be overridden.
     # =============================================================
-    # enableCollectBuildInfo: true
     # enablePublishBuild: true
     # envExclude: '*password*;*secret*;*key*;*token*;*credentials*;*ACCESS*;*PRIVATE*'
 
     # =============================================================
     # XRAY BUILD SCAN
-    # Requires enableCollectBuildInfo and enablePublishBuild.
+    # Scan the published build-info for vulnerabilities.
+    # Requires enablePublishBuild to be true.
     # =============================================================
     # enableBuildScan: true
     # buildScanFailBuild: true

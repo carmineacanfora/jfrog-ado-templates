@@ -1,5 +1,5 @@
 # stages/jfrog-docker-push.yml
-# Docker login, push, and add to build-info in a single CLI session.
+# Docker login, push, and build-info collection in a single CLI session.
 # Admin-controlled — devs cannot modify.
 
 parameters:

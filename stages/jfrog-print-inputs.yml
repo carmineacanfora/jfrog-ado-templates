@@ -1,5 +1,5 @@
 # stages/jfrog-print-inputs.yml
-# Prints pipeline configuration and what features are enabled.
+# Prints pipeline configuration and enabled features.
 # Admin-controlled — always runs.
 
 parameters:
