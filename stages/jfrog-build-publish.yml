@@ -22,7 +22,7 @@ steps:
     inputs:
       jfrogPlatformConnection: '${{ parameters.jfrogConnection }}'
       command: |
-        jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }}
+        # jf rt build-collect-env "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }}
         jf rt build-add-git "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }}
         jf rt build-publish "${{ parameters.buildName }}" "${{ parameters.buildNumber }}" --project=${{ parameters.project }} --env-exclude="${{ parameters.envExclude }}" --build-url="$(System.CollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
     displayName: 'Publish Build Info'
